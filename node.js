@@ -1,11 +1,11 @@
 // Avoiding Object.create() and the new operator
 
-const node = {
-  value : '',
-  isWord: true,
-  sibling: null, // node
-  child: null, // node
-};
+// const node = {
+//   value : '',
+//   isWord: true,
+//   sibling: null, // node
+//   child: null, // node
+// };
 
 // ************************ USING GETTERS/SETTERS ************************
 
