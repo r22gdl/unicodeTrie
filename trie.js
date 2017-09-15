@@ -4,23 +4,20 @@ const bytepack = require('./bytepack.js');
 /************************************ LIBRARY METHODS *****************************************/
 
 const walkThruPrefix = function _walkThruPrefix(startNode, prefix) {
+  let remainingPrefix = prefix;
 
   let current = startNode;
 
   let next = current.child;
 
-  while (prefix[0] !== undefined) {
-
-    while (next.value !== prefix[0]) {
+  while (next !== null && remainingPrefix[0] !== undefined) {
+    while (next.sibling !== null && next.value !== remainingPrefix[0]) {
       current = next;
       next = next.sibling;
     }
-
     current = next;
-
     next = current.child;
-
-    prefix = prefix.slice(1, prefix.length);
+    remainingPrefix = remainingPrefix.slice(1, remainingPrefix.length);
   }
   return current;
 };
@@ -32,15 +29,11 @@ const isPresent = function _isPresent(head, value) {
 
   let next;
 
-  while(current !== null) {
-
+  while (current !== null) {
     if (current.value === value) {
-
       valueIsPresent = true;
     }
-
     next = current.sibling;
-
     current = next;
   }
 
@@ -48,7 +41,7 @@ const isPresent = function _isPresent(head, value) {
 };
 
 const getNode = function _getNode(head, value) {
-  if(isPresent(head, value) === false){
+  if (isPresent(head, value) === false) {
     throw 'getNode(head, value) called without first calling isPresent(head, value)';
   }
 
@@ -56,7 +49,7 @@ const getNode = function _getNode(head, value) {
 
   let next;
 
-  while(current.value !== value) {
+  while (current.value !== value) {
     next = current.sibling;
     current = next;
   }
@@ -69,7 +62,7 @@ const getTail = function _getTail(someHead) {
 
   let next = current.sibling;
 
-  while(next !== null) {
+  while (next !== null) {
     current = next;
     next = next.sibling;
   }
@@ -77,8 +70,11 @@ const getTail = function _getTail(someHead) {
   return current;
 };
 
-const appendAtTail = function _appendAtTail(someRoot, head, nodeToInsert) {
-  if(head === null) {
+const appendAtTail = function _appendAtTail(thisRoot, head, nodeToInsert) {
+  const someRoot = thisRoot;
+
+  // empty linked list
+  if (head === null) {
     someRoot.child = nodeToInsert;
   } else {
     getTail(head).sibling = nodeToInsert;
@@ -87,12 +83,16 @@ const appendAtTail = function _appendAtTail(someRoot, head, nodeToInsert) {
 
 const insertNode = function _insertNode(nodeToInsert, prefix, someRoot) {
   const charToInsert = nodeToInsert.value;
-  let current = someRoot;
-  let subTrieRoot = walkThruPrefix(current, prefix);
-  // the child of any node is the head of another linked list. This linked list represents a single level in a subTrie
+
+  const current = someRoot;
+
+  const subTrieRoot = walkThruPrefix(current, prefix);
+
+  // the child of any node is the head of another linked list.
+  // This linked list represents a single level in a subTrie
   if (subTrieRoot.child === null) {
     subTrieRoot.child = nodeToInsert;
-  } else if(isPresent(subTrieRoot.child, charToInsert)){
+  } else if (isPresent(subTrieRoot.child, charToInsert)) {
     // do nothing
   } else {
     appendAtTail(subTrieRoot, subTrieRoot.child, nodeToInsert);
@@ -128,8 +128,8 @@ const stringToSymbolArray = function _stringToSymbolArray(str) {
 const symbolArrayToString = function _symbolArrayToString(arr) {
   let str = '';
 
-  arr.forEach(function addSymbolToString(symbol){
-    str = str + symbol;
+  arr.forEach((symbol) => {
+    str += symbol;
   });
 
   return str;
@@ -161,11 +161,11 @@ const getRootNodeSpecs = function _getRootNodeSpecs() {
 const levelOrderMap = function _levelOrderMap(closure, thisRoot) {
   let someRoot = thisRoot;
 
-  let queue = [];
+  const queue = [];
 
   // while queue not empty
   while (someRoot !== undefined) {
-    child = someRoot.child;
+    let child = someRoot.child;
 
     while (child !== null) {
       closure.onChild(child);
@@ -183,32 +183,32 @@ const levelOrderMap = function _levelOrderMap(closure, thisRoot) {
   return closure;
 };
 
-function trieToByteArrayClosure() {
+const trieToByteArrayClosure = function _trieToByteArrayClosure() {
   let byteArray = [];
 
-  function onChild (child) {
+  function onChild(child) {
     byteArray = byteArray.concat(bytepack.unicodeToByteArray(child.value));
   }
 
-  function onParent (parent) {
+  function onParent(parent) {
     byteArray = byteArray.concat(bytepack.unicodeToByteArray(parent.value));
   }
 
-  function getByteArray () {
+  function getByteArray() {
     return byteArray;
   }
 
   return {
-    onChild: onChild,
-    onParent: onParent,
-    getReturnValue: getByteArray,
+    onChild,
+    onParent,
+    getByteArray,
   };
-}
+};
 
-function trieToBitArrayClosure() {
+const trieToBitArrayClosure = function _trieToBitArrayClosure() {
   const bitArray = [];
 
-  function onChild (child) {
+  function onChild(child) {
     bitArray.push(1);
   }
 
@@ -221,11 +221,11 @@ function trieToBitArrayClosure() {
   }
 
   return {
-    onParent : onParent,
-    onChild: onChild,
-    getReturnValue: getBitArray,
+    onParent,
+    onChild,
+    getBitArray,
   };
-}
+};
 
 
 /************************************ CONSTRUCTOR *********************************************/
@@ -239,26 +239,26 @@ const Trie = function _Trie() {
   superRootNode.child = rootNode;
 
   const isStringInTrieHelper = function _isStringInTrieHelper(str, head) {
-    arr = stringToSymbolArray(str);
+    let arr = stringToSymbolArray(str);
 
-    // if symbol array is empty, we've recursed through entire string meaning string is stored in trie
-    if(arr[0] === undefined) {
+    // if symbol array is empty, we've recursed thru entire string
+    if (arr[0] === undefined) {
       return true;
-
-    // if we recurse on an empty subTrie or the current symbol is nowhere to be found at current level, the string is not stored in trie
-    } if (head === null || (isPresent(head, arr[0]) === false)) {
-      return false;
-
-    // recurse on the remaining part of the string
-    } else {
-      // every node is the root of a subTrie within larger Trie
-      const subTrieRoot = getNode(head, arr[0]);
-      arr = arr.slice(1);
-
-      str = symbolArrayToString(arr);
-
-      return isStringInTrieHelper(str, subTrieRoot.child);
     }
+
+    // if we recurse on empty subTrie or symbol is nowhere to be found at current level
+    if (head === null || (isPresent(head, arr[0]) === false)) {
+      return false;
+    }
+
+    // every node is the root of a subTrie within larger Trie
+    const subTrieRoot = getNode(head, arr[0]);
+
+    arr = arr.slice(1);
+
+    const remainingStr = symbolArrayToString(arr);
+
+    return isStringInTrieHelper(remainingStr, subTrieRoot.child);
   };
 
   const trieToBitArray = function _trieToBitArray() {
@@ -284,18 +284,18 @@ const Trie = function _Trie() {
   const stringToTrie = function _stringtoTrie(str) {
     const strArr = stringToSymbolArray(str);
 
-    strArr.forEach(function charToTrieWrapper(someChar, index, array) {
+    strArr.forEach((someChar, index, array) => {
       charToTrie(someChar, index, array, rootNode);
     });
   };
 
   return {
-    trieToBitArray: trieToBitArray,
-    trieToByteArray: trieToByteArray,
-    isStringInTrie: isStringInTrie,
-    stringToTrie: stringToTrie,
+    trieToBitArray,
+    trieToByteArray,
+    isStringInTrie,
+    stringToTrie,
   };
-}
+};
 
 /************************************ EXPORT **************************************************/
 
