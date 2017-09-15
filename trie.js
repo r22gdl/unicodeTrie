@@ -5,9 +5,7 @@ const bytepack = require('./bytepack.js');
 
 const walkThruPrefix = function _walkThruPrefix(startNode, prefix) {
   let remainingPrefix = prefix;
-
   let current = startNode;
-
   let next = current.child;
 
   while (next !== null && remainingPrefix[0] !== undefined) {
@@ -24,9 +22,7 @@ const walkThruPrefix = function _walkThruPrefix(startNode, prefix) {
 
 const isPresent = function _isPresent(head, value) {
   let valueIsPresent = false;
-
   let current = head;
-
   let next;
 
   while (current !== null) {
@@ -46,7 +42,6 @@ const getNode = function _getNode(head, value) {
   }
 
   let current = head;
-
   let next;
 
   while (current.value !== value) {
@@ -59,7 +54,6 @@ const getNode = function _getNode(head, value) {
 
 const getTail = function _getTail(someHead) {
   let current = someHead;
-
   let next = current.sibling;
 
   while (next !== null) {
@@ -83,9 +77,7 @@ const appendAtTail = function _appendAtTail(thisRoot, head, nodeToInsert) {
 
 const insertNode = function _insertNode(nodeToInsert, prefix, someRoot) {
   const charToInsert = nodeToInsert.value;
-
   const current = someRoot;
-
   const subTrieRoot = walkThruPrefix(current, prefix);
 
   // the child of any node is the head of another linked list.
@@ -113,9 +105,7 @@ const makeNode = function _makeNode(char, bool) {
 const charToTrie = function _charToTrie(currentChar, index, array, someRoot) {
   // if last character, then character denotes word
   const denotesWord = (index === (array.length - 1));
-
   const myNode = makeNode(currentChar, denotesWord);
-
   const prefix = array.slice(0, index);
 
   return insertNode(myNode, prefix, someRoot);
@@ -160,7 +150,6 @@ const getRootNodeSpecs = function _getRootNodeSpecs() {
 // provide a closure with methods and an object
 const levelOrderMap = function _levelOrderMap(closure, thisRoot) {
   let someRoot = thisRoot;
-
   const queue = [];
 
   // while queue not empty
@@ -169,14 +158,11 @@ const levelOrderMap = function _levelOrderMap(closure, thisRoot) {
 
     while (child !== null) {
       closure.onChild(child);
-
       queue.push(child);
-
       child = child.sibling;
     }
 
     closure.onParent(someRoot);
-
     someRoot = queue.shift();
   }
 
@@ -233,9 +219,7 @@ const trieToBitArrayClosure = function _trieToBitArrayClosure() {
 
 const Trie = function _Trie() {
   const superRootNode = Node(getSuperRootNodeSpecs());
-
   const rootNode = Node(getRootNodeSpecs());
-
   superRootNode.child = rootNode;
 
   const isStringInTrieHelper = function _isStringInTrieHelper(str, head) {
@@ -253,9 +237,7 @@ const Trie = function _Trie() {
 
     // every node is the root of a subTrie within larger Trie
     const subTrieRoot = getNode(head, arr[0]);
-
     arr = arr.slice(1);
-
     const remainingStr = symbolArrayToString(arr);
 
     return isStringInTrieHelper(remainingStr, subTrieRoot.child);
@@ -263,17 +245,13 @@ const Trie = function _Trie() {
 
   const trieToBitArray = function _trieToBitArray() {
     const myClosure = trieToBitArrayClosure();
-
     levelOrderMap(myClosure, superRootNode);
-
     return myClosure.getReturnValue();
   };
 
   const trieToByteArray = function _trieToByteArray() {
     const myClosure = trieToByteArrayClosure();
-
     levelOrderMap(myClosure);
-
     return myClosure.getReturnValue();
   };
 
