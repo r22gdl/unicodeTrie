@@ -17,11 +17,11 @@ Our radix tree can be compacted into a "succinct data structure" as suggested by
 According to Steve Havnov's post, we compact this graph into an array of 0s and 1s that convey the parent-child relationships between the nodes in the graph. This array of 0s and 1s is further compacted by encoding every sequence of 6 digits in the aforementioned "bit array" into one of 64 characters. This resulting "BASE64" string (effectively a succinct trie which we'll call `base64SuccinctTrie`) still holds the same information about parent-child relationships between nodes as the original radix tree. We then create a structure to hold only the unicode symbols stored in the trie. This second data structure supplements the information about relationships between nodes in the graph. We use both data structures in conjunction to navigate between nodes, child nodes, and sibling nodes much like we would navigate a radix tree.
 
 
-To translate our trie (ie radix tree) into a `base64SuccinctTrie`, we must perform the following procedure:
+To translate our trie (ie radix tree) into a `base64SuccinctTrie`, we must perform the following procedure
 
-[Step 1] `const myTrie = Trie();`
-[Step 2] `const trieBitArray = myTrie.trieToBitArray();`
-[Step 3] `const base64SuccinctTrie = bytepack.bitArrayToBase64String(trieBitArray);`
+[Step 1] `const myTrie = Trie();`.
+[Step 2] `const trieBitArray = myTrie.trieToBitArray();`.
+[Step 3] `const base64SuccinctTrie = bytepack.bitArrayToBase64String(trieBitArray);`.
 
 We create the accompanying data structure that holds the unicodeSymbols in the trie inserted in level order by doing the following
 
