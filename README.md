@@ -19,9 +19,9 @@ According to Steve Havnov's post, we compact this graph into an array of 0s and 
 
 To translate our trie (ie radix tree) into a `base64SuccinctTrie`, we must perform the following procedure
 
-[Step 1] `const myTrie = Trie();`.
-[Step 2] `const trieBitArray = myTrie.trieToBitArray();`.
-[Step 3] `const base64SuccinctTrie = bytepack.bitArrayToBase64String(trieBitArray);`.
+[Step 1] `const myTrie = Trie();` <br />
+[Step 2] `const trieBitArray = myTrie.trieToBitArray();` <br />
+[Step 3] `const base64SuccinctTrie = bytepack.bitArrayToBase64String(trieBitArray);` <br />
 
 We create the accompanying data structure that holds the unicodeSymbols in the trie inserted in level order by doing the following
 
