@@ -181,14 +181,14 @@ const trieToUnicodeSymbolArrayClosure = function _trieToUnicodeSymbolArrayClosur
     byteArray = byteArray.concat(bytepack.unicodeSymbolToExpandedByteArray(parent.value));
   }
 
-  function getByteArray() {
+  function getReturnValue() {
     return byteArray;
   }
 
   return {
     onChild,
     onParent,
-    getByteArray,
+    getReturnValue,
   };
 };
 
@@ -203,14 +203,14 @@ const trieToBitArrayClosure = function _trieToBitArrayClosure() {
     bitArray.push(0);
   }
 
-  function getBitArray() {
+  function getReturnValue() {
     return bitArray;
   }
 
   return {
-    onParent,
     onChild,
-    getBitArray,
+    onParent,
+    getReturnValue,
   };
 };
 
@@ -250,7 +250,7 @@ const Trie = function _Trie() {
 
   const trieToUnicodeSymbolArray = function _trieToUnicodeSymbolArray() {
     const myClosure = trieToUnicodeSymbolArrayClosure();
-    levelOrderMap(myClosure);
+    levelOrderMap(myClosure, superRootNode);
     return myClosure.getReturnValue();
   };
 
