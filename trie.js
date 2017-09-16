@@ -117,7 +117,6 @@ const stringToSymbolArray = function _stringToSymbolArray(str) {
 
 const symbolArrayToString = function _symbolArrayToString(arr) {
   let str = '';
-
   arr.forEach((symbol) => {
     str += symbol;
   });
@@ -169,7 +168,7 @@ const levelOrderMap = function _levelOrderMap(closure, thisRoot) {
   return closure;
 };
 
-const trieToByteArrayClosure = function _trieToByteArrayClosure() {
+const trieToUnicodeSymbolArrayClosure = function _trieToUnicodeSymbolArrayClosure() {
   let byteArray = [];
 
   function onChild(child) {
@@ -229,12 +228,10 @@ const Trie = function _Trie() {
     if (arr[0] === undefined) {
       return true;
     }
-
     // if we recurse on empty subTrie or symbol is nowhere to be found at current level
     if (head === null || (isPresent(head, arr[0]) === false)) {
       return false;
     }
-
     // every node is the root of a subTrie within larger Trie
     const subTrieRoot = getNode(head, arr[0]);
     arr = arr.slice(1);
@@ -249,8 +246,8 @@ const Trie = function _Trie() {
     return myClosure.getReturnValue();
   };
 
-  const trieToByteArray = function _trieToByteArray() {
-    const myClosure = trieToByteArrayClosure();
+  const trieToUnicodeSymbolArray = function _trieToUnicodeSymbolArray() {
+    const myClosure = trieToUnicodeSymbolArrayClosure();
     levelOrderMap(myClosure);
     return myClosure.getReturnValue();
   };
@@ -261,7 +258,6 @@ const Trie = function _Trie() {
 
   const stringToTrie = function _stringtoTrie(str) {
     const strArr = stringToSymbolArray(str);
-
     strArr.forEach((someChar, index, array) => {
       charToTrie(someChar, index, array, rootNode);
     });
@@ -269,7 +265,7 @@ const Trie = function _Trie() {
 
   return {
     trieToBitArray,
-    trieToByteArray,
+    trieToUnicodeSymbolArray,
     isStringInTrie,
     stringToTrie,
   };
