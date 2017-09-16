@@ -85,7 +85,6 @@ const setBitAt = function _setBitAt(bit, index, c) {
   return (ord(c) | mask);
 };
 
-
 const getOffsetOfLastBit = function _getOffsetOfLastBit(numBitsAddedToBase64String) {
   return numBitsAddedToBase64String % byteWidth;
 };
