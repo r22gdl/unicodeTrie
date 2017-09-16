@@ -174,11 +174,11 @@ const trieToUnicodeSymbolArrayClosure = function _trieToUnicodeSymbolArrayClosur
   let byteArray = [];
 
   function onChild(child) {
-    byteArray = byteArray.concat(bytepack.unicodeToByteArray(child.value));
+    byteArray = byteArray.concat(bytepack.unicodeSymbolToExpandedByteArray(child.value));
   }
 
   function onParent(parent) {
-    byteArray = byteArray.concat(bytepack.unicodeToByteArray(parent.value));
+    byteArray = byteArray.concat(bytepack.unicodeSymbolToExpandedByteArray(parent.value));
   }
 
   function getByteArray() {
