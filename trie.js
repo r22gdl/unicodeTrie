@@ -1,3 +1,5 @@
+/* eslint spaced-comment: 0, jsx-a11y/href-no-hash: 0 */
+
 const { Node } = require('./node.js');
 const bytepack = require('./bytepack.js');
 
@@ -193,11 +195,11 @@ const trieToUnicodeSymbolArrayClosure = function _trieToUnicodeSymbolArrayClosur
 const trieToBitArrayClosure = function _trieToBitArrayClosure() {
   const bitArray = [];
 
-  function onChild(child) {
+  function onChild() {
     bitArray.push(1);
   }
 
-  function onParent(parent) {
+  function onParent() {
     bitArray.push(0);
   }
 
