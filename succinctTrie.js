@@ -90,8 +90,6 @@ function Base64SuccinctTrie(someBase64String, someExpandedUnicodeArray, someZero
   };
 
   return {
-    select,
-    getNthChildOfNodeNumber,
     isStringInSuccintTrie,
   };
 }
