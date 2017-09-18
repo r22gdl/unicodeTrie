@@ -3,10 +3,11 @@ const Bytepack = require('./bytepack.js');
 
 /************************************ CONSTRUCTOR *********************************************/
 
-function Base64SuccinctTrie(someBase64String, someExpandedUnicodeArray, someZeroPositions) {
+function Base64SuccinctTrie(someBase64String, someExpandedUnicodeArray, someZeroPositions, someNodeNumbersThatDenoteWords) {
   const base64String = someBase64String;
   const expandedUnicodeArray = someExpandedUnicodeArray;
   const zeroPositions = someZeroPositions;
+  const nodesThatDenoteWords = someNodeNumbersThatDenoteWords;
 
   // returns the number of zeros present in base64String before the char at the given index
   const getNumZerosBeforeCharIndex = function _getNumZerosBeforeCharIndex(index) {
@@ -63,22 +64,36 @@ function Base64SuccinctTrie(someBase64String, someExpandedUnicodeArray, someZero
     return str.split('');
   };
 
-  const isStringInSuccintTrie = function _isStringInSuccintTrie(someString) {
-    let someRoot = 0; // rootNode number is 0
+  const nodeNumberDenotesWord = function _nodeNumberDenotesWord(nodeNumber) {
+    /*
+    The find() method returns the value of the first element in the array that
+    satisfies the provided testing function. Otherwise undefined is returned.
+    **/
+    const found = nodesThatDenoteWords.find(element => element === nodeNumber);
+    if (found === undefined) {
+      return false;
+    }
+    return true;
+  };
+
+  // TODO: Refactor + make more readable
+  const isStringAWordInSuccintTrie = function _isStringAWordInSuccintTrie(someString) {
+    let nthChild;
+    let someParent = 0; // rootNode number is 0
     let someSymbolArray = stringToSymbolArray(someString);
     let matchedSymbolToChild = true;
 
     while ((matchedSymbolToChild === true) && (someSymbolArray.length > 0)) {
       let counter = 1;
-      const numberOfChildren = getNumChildren(someRoot);
+      const numberOfChildren = getNumChildren(someParent);
       matchedSymbolToChild = false;
 
       if (numberOfChildren > 0) {
-        while (counter <= numberOfChildren && (matchedSymbolToChild === false)) {
-          const nthChild = getNthChildOfNodeNumber(someRoot, counter);
+        while ((counter <= numberOfChildren) && (matchedSymbolToChild === false)) {
+          nthChild = getNthChildOfNodeNumber(someParent, counter);
 
-          if (nodeNumberToUnicodeSymbol(nthChild) === someSymbolArray[0]) {
-            someRoot = nthChild;
+          if ((nodeNumberToUnicodeSymbol(nthChild) === someSymbolArray[0])) {
+            someParent = nthChild;
             matchedSymbolToChild = true;
             someSymbolArray = someSymbolArray.slice(1);
           }
@@ -86,11 +101,12 @@ function Base64SuccinctTrie(someBase64String, someExpandedUnicodeArray, someZero
         }
       }
     }
-    return (someSymbolArray.length === 0);
+    const numberOfLastNodeVisited = nthChild;
+    return (someSymbolArray.length === 0 && (nodeNumberDenotesWord(numberOfLastNodeVisited) === true));
   };
 
   return {
-    isStringInSuccintTrie,
+    isStringAWordInSuccintTrie,
   };
 }
 
