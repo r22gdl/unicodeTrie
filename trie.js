@@ -1,7 +1,7 @@
 /* eslint spaced-comment: 0, jsx-a11y/href-no-hash: 0 */
 
 const { Node } = require('./node.js');
-const bytepack = require('./bytepack.js');
+const Bytepack = require('./bytepack.js');
 
 /************************************ LIBRARY METHODS *****************************************/
 
@@ -174,11 +174,11 @@ const trieToUnicodeSymbolArrayClosure = function _trieToUnicodeSymbolArrayClosur
   let byteArray = [];
 
   function onChild(child) {
-    byteArray = byteArray.concat(bytepack.unicodeSymbolToExpandedByteArray(child.value));
+    byteArray = byteArray.concat(Bytepack.unicodeSymbolsToExpandedByteArray(child.value));
   }
 
   function onParent(parent) {
-    byteArray = byteArray.concat(bytepack.unicodeSymbolToExpandedByteArray(parent.value));
+    byteArray = byteArray.concat(Bytepack.unicodeSymbolsToExpandedByteArray(parent.value));
   }
 
   function getReturnValue() {
@@ -214,6 +214,89 @@ const trieToBitArrayClosure = function _trieToBitArrayClosure() {
   };
 };
 
+const getPositionsOfZerosInTrieClosure = function _getPositionsOfZerosInTrieClosure() {
+  let indexInBitArray = 0;
+  const positionsOfZeros = [];
+
+  function incrementIndexInBitArray() {
+    indexInBitArray += 1;
+  }
+
+  function onChild() {
+    incrementIndexInBitArray();
+  }
+
+  function onParent() {
+    positionsOfZeros.push(Math.floor(indexInBitArray / Bytepack.byteWidth));
+    incrementIndexInBitArray();
+  }
+
+  function getReturnValue() {
+    return positionsOfZeros;
+  }
+
+  return {
+    onChild,
+    onParent,
+    getReturnValue,
+  };
+};
+
+const trieToSymbolStringClosure = function _trieToSymbolStringClosure() {
+  let str = '';
+
+  function onChild() {
+    // do nothing
+  }
+
+  function onParent(parent) {
+    if(parent.value === 0xFF){
+      str += '_';
+    } else {
+      str += parent.value;
+    }
+  }
+
+  function getReturnValue() {
+    return str;
+  }
+
+  return {
+    onChild,
+    onParent,
+    getReturnValue,
+  };
+};
+
+const getNodesThatDenoteWordsClosure = function _getNodesThatDenoteWordsClosure() {
+  let nodeNumber = 0;
+  const nodesThatDenoteWords = [];
+
+  function incrementNodeNumber() {
+    nodeNumber +=1;
+  }
+
+  function onChild() {
+    // do nothing
+  }
+
+  function onParent(parent) {
+    if(parent.isWord === true) {
+      nodesThatDenoteWords.push(nodeNumber);
+    }
+    incrementNodeNumber();
+  }
+
+  function getReturnValue() {
+    return nodesThatDenoteWords;
+  }
+
+  return {
+    onChild,
+    onParent,
+    getReturnValue,
+  };
+};
 
 /************************************ CONSTRUCTOR *********************************************/
 
@@ -254,22 +337,48 @@ const Trie = function _Trie() {
     return myClosure.getReturnValue();
   };
 
+  const trieToSymbolString = function _trieToSymbolString() {
+    const myClosure = trieToSymbolStringClosure();
+    levelOrderMap(myClosure, rootNode);
+    return myClosure.getReturnValue();
+  };
+
+  const getPositionsOfZerosInTrie = function _getPositionsOfZerosInTrie() {
+    const myClosure = getPositionsOfZerosInTrieClosure();
+    levelOrderMap(myClosure, superRootNode);
+    return myClosure.getReturnValue();
+  };
+
+  /*
+  returns an array of node numbers (the number representing the order of the node in level order
+  traversal ) for nodes that denote the end of a complete word in trie
+  **/
+  const getNodesThatDenoteWords = function _getNodesThatDenoteWords() {
+    const myClosure = getNodesThatDenoteWordsClosure();
+    levelOrderMap(myClosure, rootNode);
+    return myClosure.getReturnValue();
+  };
+
   const isStringInTrie = function _isStringInTrie(str) {
     return isStringInTrieHelper(str, rootNode.child);
   };
 
-  const stringToTrie = function _stringtoTrie(str) {
+  const addStringToTrie = function _addStringToTrie(str) {
     const strArr = stringToSymbolArray(str);
     strArr.forEach((someChar, index, array) => {
       charToTrie(someChar, index, array, rootNode);
     });
   };
 
+
   return {
     trieToBitArray,
     trieToUnicodeSymbolArray,
+    trieToSymbolString,
+    getPositionsOfZerosInTrie,
+    getNodesThatDenoteWords,
     isStringInTrie,
-    stringToTrie,
+    addStringToTrie,
   };
 };
 
