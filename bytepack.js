@@ -1,8 +1,9 @@
-/* eslint spaced-comment: 0, no-bitwise: 0, jsx-a11y/href-no-hash: 0 */
+/* eslint spaced-comment: 0, no-bitwise: 0, jsx-a11y/href-no-hash: 0, max-len: 0 */
 
 /************************************ CONSTANTS *************************************************/
 
 // INVARIANT: BYTES ARE LITTLE ENDIAN
+
 const byteWidth = 6;
 const BASE64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
 const BASE64_CACHE = (function setBase64Cache() { // EXPLAIN
@@ -11,7 +12,6 @@ const BASE64_CACHE = (function setBase64Cache() { // EXPLAIN
   return cache;
 }());
 const bytesPerSymbol = 5;
-
 
 /************************************ METHODS *************************************************/
 
@@ -138,7 +138,7 @@ const getPadding = function _getPadding(byteLength, denotesWord) {
   return padding;
 };
 
-const unicodeSymbolToExpandedByteArray = function _unicodeSymbolToExpandedByteArray(str) {
+const unicodeSymbolsToExpandedByteArray = function _unicodeSymbolsToExpandedByteArray(str) {
   let byteArray = [];
   let denotesWord = false;
   for (let i = 0; i < str.length; i += 1) {
@@ -183,7 +183,17 @@ const expandedByteArrayToUnicodeSymbol = function _expandedByteArrayToUnicodeSym
 };
 
 /************************************ EXPORTS *************************************************/
+
 exports.addBitToBase64String = addBitToBase64String;
-exports.unicodeSymbolToExpandedByteArray = unicodeSymbolToExpandedByteArray;
+
+exports.unicodeSymbolsToExpandedByteArray = unicodeSymbolsToExpandedByteArray;
+
 exports.expandedByteArrayToUnicodeSymbol = expandedByteArrayToUnicodeSymbol;
+
 exports.bitArrayToBase64String = bitArrayToBase64String;
+
+exports.byteWidth = byteWidth;
+
+exports.getBitArray = getBitArray;
+
+exports.bytesPerSymbol = bytesPerSymbol;
