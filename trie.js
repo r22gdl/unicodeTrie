@@ -250,7 +250,7 @@ const trieToSymbolStringClosure = function _trieToSymbolStringClosure() {
   }
 
   function onParent(parent) {
-    if(parent.value === 0xFF){
+    if (parent.value === 0xFF) {
       str += '_';
     } else {
       str += parent.value;
@@ -273,7 +273,7 @@ const getNodesThatDenoteWordsClosure = function _getNodesThatDenoteWordsClosure(
   const nodesThatDenoteWords = [];
 
   function incrementNodeNumber() {
-    nodeNumber +=1;
+    nodeNumber += 1;
   }
 
   function onChild() {
@@ -281,7 +281,7 @@ const getNodesThatDenoteWordsClosure = function _getNodesThatDenoteWordsClosure(
   }
 
   function onParent(parent) {
-    if(parent.isWord === true) {
+    if (parent.isWord === true) {
       nodesThatDenoteWords.push(nodeNumber);
     }
     incrementNodeNumber();
