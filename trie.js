@@ -140,7 +140,7 @@ const getSuperRootNodeSpecs = function _getSuperRootNodeSpecs() {
 const getRootNodeSpecs = function _getRootNodeSpecs() {
   const nodeSpecs = {
     value: 0xFF, // EXPLAIN
-    isWord: false,
+    isWord: true,
     sibling: null, // node
     child: null, // node
   };
@@ -298,6 +298,25 @@ const getNodesThatDenoteWordsClosure = function _getNodesThatDenoteWordsClosure(
   };
 };
 
+const isStringInTrieHelper = function _isStringInTrieHelper(str, head) {
+  let arr = stringToSymbolArray(str);
+
+  // if symbol array is empty, we've recursed thru entire string
+  if (arr[0] === undefined) {
+    return true;
+  }
+  // if we recurse on empty subTrie or symbol is nowhere to be found at current level
+  if (head === null || (isPresent(head, arr[0]) === false)) {
+    return false;
+  }
+  // every node is the root of a subTrie within larger Trie
+  const subTrieRoot = getNode(head, arr[0]);
+  arr = arr.slice(1);
+  const remainingStr = symbolArrayToString(arr);
+
+  return isStringInTrieHelper(remainingStr, subTrieRoot.child);
+};
+
 /************************************ CONSTRUCTOR *********************************************/
 
 
@@ -305,25 +324,6 @@ const Trie = function _Trie() {
   const superRootNode = Node(getSuperRootNodeSpecs());
   const rootNode = Node(getRootNodeSpecs());
   superRootNode.child = rootNode;
-
-  const isStringInTrieHelper = function _isStringInTrieHelper(str, head) {
-    let arr = stringToSymbolArray(str);
-
-    // if symbol array is empty, we've recursed thru entire string
-    if (arr[0] === undefined) {
-      return true;
-    }
-    // if we recurse on empty subTrie or symbol is nowhere to be found at current level
-    if (head === null || (isPresent(head, arr[0]) === false)) {
-      return false;
-    }
-    // every node is the root of a subTrie within larger Trie
-    const subTrieRoot = getNode(head, arr[0]);
-    arr = arr.slice(1);
-    const remainingStr = symbolArrayToString(arr);
-
-    return isStringInTrieHelper(remainingStr, subTrieRoot.child);
-  };
 
   const trieToBitArray = function _trieToBitArray() {
     const myClosure = trieToBitArrayClosure();
@@ -351,7 +351,7 @@ const Trie = function _Trie() {
 
   /*
   returns an array of node numbers (the number representing the order of the node in level order
-  traversal ) for nodes that denote the end of a complete word in trie
+  traversal) for nodes that denote the end of a complete word in trie
   **/
   const getNodesThatDenoteWords = function _getNodesThatDenoteWords() {
     const myClosure = getNodesThatDenoteWordsClosure();
