@@ -1,6 +1,25 @@
 /* eslint spaced-comment: 0, jsx-a11y/href-no-hash: 0, max-len: 0 */
 const Bytepack = require('./bytepack.js');
 
+const stringToSymbolArray = function _stringToSymbolArray(str) {
+  return str.split('');
+};
+
+const symbolArrayToString = function _symbolArrayToString(arr) {
+  let str = '';
+  arr.forEach((symbol) => {
+    str += symbol;
+  });
+
+  return str;
+};
+
+const removeLastSymbol = function _removeLastSymbol(someString) {
+  const symbolArray = stringToSymbolArray(someString);
+  const symbolArrayWithoutLastSymbol = symbolArray.slice(0, symbolArray.length - 1);
+  return symbolArrayToString(symbolArrayWithoutLastSymbol);
+};
+
 /************************************ CONSTRUCTOR *********************************************/
 
 function Base64SuccinctTrie(someBase64String, someExpandedUnicodeArray, someZeroPositions, someNodeNumbersThatDenoteWords) {
@@ -17,7 +36,6 @@ function Base64SuccinctTrie(someBase64String, someExpandedUnicodeArray, someZero
     }
     return iter;
   };
-
 
   const getPosOfNthZeroInChar = function _getPosOfNthZeroInChar(numberOfZerosBeforeChar, characterBitArray, n) {
     let counter = 0;
@@ -48,6 +66,7 @@ function Base64SuccinctTrie(someBase64String, someExpandedUnicodeArray, someZero
   };
 
   const nodeNumberToUnicodeSymbol = function _nodeNumberToUnicodeSymbol(nodeNumber) {
+    if (nodeNumber === 0) { return ''; } // rootNode should return empty string ie no symbol
     return Bytepack.expandedByteArrayToUnicodeSymbol(
       expandedUnicodeArray.slice(
         (nodeNumber * Bytepack.bytesPerSymbol),
@@ -58,10 +77,6 @@ function Base64SuccinctTrie(someBase64String, someExpandedUnicodeArray, someZero
     // NodeNumber of  = (select(i + 1) - i);
     const nodeNumberOfChild = (select(nodeNumber + 1) - nodeNumber) + (childNumber - 1);
     return nodeNumberOfChild;
-  };
-
-  const stringToSymbolArray = function _stringToSymbolArray(str) {
-    return str.split('');
   };
 
   const nodeNumberDenotesWord = function _nodeNumberDenotesWord(nodeNumber) {
@@ -76,37 +91,180 @@ function Base64SuccinctTrie(someBase64String, someExpandedUnicodeArray, someZero
     return true;
   };
 
-  // TODO: Refactor + make more readable
-  const isStringAWordInSuccintTrie = function _isStringAWordInSuccintTrie(someString) {
+  const walkThroughTrie = function _walkThroughTrie(myClosure) {
     let nthChild;
     let someParent = 0; // rootNode number is 0
-    let someSymbolArray = stringToSymbolArray(someString);
-    let matchedSymbolToChild = true;
-
-    while ((matchedSymbolToChild === true) && (someSymbolArray.length > 0)) {
+    myClosure.startForwardWalking(someParent);
+    while (myClosure.keepForwardWalking() === true) {
       let counter = 1;
       const numberOfChildren = getNumChildren(someParent);
-      matchedSymbolToChild = false;
-
-      if (numberOfChildren > 0) {
-        while ((counter <= numberOfChildren) && (matchedSymbolToChild === false)) {
-          nthChild = getNthChildOfNodeNumber(someParent, counter);
-
-          if ((nodeNumberToUnicodeSymbol(nthChild) === someSymbolArray[0])) {
-            someParent = nthChild;
-            matchedSymbolToChild = true;
-            someSymbolArray = someSymbolArray.slice(1);
-          }
-          counter += 1;
-        }
+      myClosure.startSidewaysWalking();
+      while ((counter <= numberOfChildren) && (myClosure.keepSidewaysWalking() === true)) {
+        nthChild = getNthChildOfNodeNumber(someParent, counter);
+        myClosure.update(nthChild);
+        counter += 1; // side step
       }
+
+      someParent = nthChild; // forward step
     }
-    const numberOfLastNodeVisited = nthChild;
-    return (someSymbolArray.length === 0 && (nodeNumberDenotesWord(numberOfLastNodeVisited) === true));
+  };
+
+  const isStringAWordInTrieClosure = function _isStringAWordInTrieClosure(someString) {
+    let matchSymbolToNode;
+    let symbolArray = stringToSymbolArray(someString);
+    let lastNodeVisited;
+
+    const startForwardWalking = function _startForwardWalking(someNode) {
+      matchSymbolToNode = true;
+      lastNodeVisited = someNode;
+    };
+
+    const keepForwardWalking = function _keepForwardWalking() {
+      return ((matchSymbolToNode === true) && (symbolArray.length > 0));
+    };
+
+    const startSidewaysWalking = function _startSidewaysWalking() {
+      matchSymbolToNode = false;
+    };
+
+    const keepSidewaysWalking = function _keepSidewaysWalking() {
+      return (matchSymbolToNode === false);
+    };
+
+    const update = function _update(nodeNumber) {
+      if ((nodeNumberToUnicodeSymbol(nodeNumber) === symbolArray[0])) {
+        matchSymbolToNode = true;
+        lastNodeVisited = nodeNumber;
+        symbolArray = symbolArray.slice(1);
+      }
+    };
+
+    const getReturnValue = function _getReturnValue() {
+      return ((symbolArray.length === 0) && (nodeNumberDenotesWord(lastNodeVisited) === true));
+    };
+
+    return {
+      startForwardWalking,
+      keepForwardWalking,
+      startSidewaysWalking,
+      keepSidewaysWalking,
+      update,
+      getReturnValue,
+    };
+  };
+
+  const isStringAWordInTrie = function _isStringAWordInTrie(someString) {
+    const myClosure = isStringAWordInTrieClosure(someString);
+    walkThroughTrie(myClosure);
+    return myClosure.getReturnValue();
+  };
+
+  const getSubtrieAtClosure = function _getSubtrieAtClosure(someString) {
+    let matchSymbolToNode;
+    let symbolArray = stringToSymbolArray(someString);
+    let lastNodeVisited;
+
+    const startForwardWalking = function _startForwardWalking(someNode) {
+      matchSymbolToNode = true;
+      lastNodeVisited = someNode;
+    };
+
+    const keepForwardWalking = function _keepForwardWalking() {
+      return ((matchSymbolToNode === true) && (symbolArray.length > 0));
+    };
+
+    const startSidewaysWalking = function _startSidewaysWalking() {
+      matchSymbolToNode = false;
+    };
+
+    const keepSidewaysWalking = function _keepSidewaysWalking() {
+      return (matchSymbolToNode === false);
+    };
+
+    const update = function _update(nodeNumber) {
+      if ((nodeNumberToUnicodeSymbol(nodeNumber) === symbolArray[0])) {
+        matchSymbolToNode = true;
+        lastNodeVisited = nodeNumber;
+        symbolArray = symbolArray.slice(1);
+      }
+    };
+
+    const getReturnValue = function _getReturnValue() {
+      return (symbolArray.length === 0) ? lastNodeVisited : null;
+    };
+
+    return {
+      startForwardWalking,
+      keepForwardWalking,
+      startSidewaysWalking,
+      keepSidewaysWalking,
+      update,
+      getReturnValue,
+    };
+  };
+
+  // Returns the node that represents the last symbol in the unicode string provided.
+  // This node may be treated as the root of subTrie inside the larger trie
+  const getSubtrieAt = function _getSubtrieAt(someString) {
+    const myClosure = getSubtrieAtClosure(someString);
+    walkThroughTrie(myClosure);
+    return myClosure.getReturnValue();
+  };
+
+  const formWords = function _formWords(prefix, endings, prefixIsWord) {
+    const words = [];
+    if (prefixIsWord === true) {
+      words.push(prefix);
+    }
+    endings.forEach((wordEnding) => {
+      let word = removeLastSymbol(prefix);
+      if (wordEnding.length > 0) {
+        wordEnding.forEach((nodeNumber) => {
+          word += nodeNumberToUnicodeSymbol(nodeNumber);
+        });
+        words.push(word);
+      }
+    });
+    return words;
+  };
+
+  const getWordsThatStartWithPrefix = function _getWordsThatStartWithPrefix(prefixString) {
+    const nodeStack = [];
+    const counterStack = [];
+    const wordEndings = [];
+    const someNode = getSubtrieAt(prefixString);
+    let prefixIsWord = false;
+    if (someNode === null) { // prefixString not stored in trie
+      return [];
+    }
+    // start walking
+    counterStack.push(1);
+    nodeStack.push(someNode);
+    if (nodeNumberDenotesWord(nodeStack[nodeStack.length - 1]) === true) {
+      wordEndings.push(nodeStack);
+      prefixIsWord = true;
+    }
+
+    while (nodeStack.length > 0) {
+      while (counterStack[counterStack.length - 1] <= getNumChildren(nodeStack[nodeStack.length - 1])) {
+        // step forward
+        const nThChild = getNthChildOfNodeNumber(nodeStack[nodeStack.length - 1], counterStack[counterStack.length - 1]);
+        nodeStack.push(nThChild);
+        counterStack.push(1);
+        if (nodeNumberDenotesWord(nodeStack[nodeStack.length - 1]) === true) { wordEndings.push(nodeStack.slice(0)); }
+      }
+      // step backwards
+      nodeStack.pop();
+      counterStack.pop();
+      // step sideways
+      counterStack[counterStack.length - 1] += 1;
+    }
+    return formWords(prefixString, wordEndings, prefixIsWord);
   };
 
   return {
-    isStringAWordInSuccintTrie,
+    isStringAWordInTrie,
+    getWordsThatStartWithPrefix,
   };
 }
 
