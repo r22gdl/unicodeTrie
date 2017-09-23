@@ -20,18 +20,16 @@ const removeLastSymbol = function _removeLastSymbol(someString) {
   return symbolArrayToString(symbolArrayWithoutLastSymbol);
 };
 
-/************************************ CONSTRUCTOR *********************************************/
+/************************************ SUCCINCT TRIE CONSTRUCTOR *********************************************/
 
-function Base64SuccinctTrie(someBase64String, someExpandedUnicodeArray, someZeroPositions, someNodeNumbersThatDenoteWords) {
-  const base64String = someBase64String;
-  const expandedUnicodeArray = someExpandedUnicodeArray;
-  const zeroPositions = someZeroPositions;
-  const nodesThatDenoteWords = someNodeNumbersThatDenoteWords;
+function Base64SuccinctTrie(succinctTrieInformation) {
+
+  const {base64String, symbolString, positionsOfZeros, nodeNumbersThatDenoteWords} = succinctTrieInformation;
 
   // returns the number of zeros present in base64String before the char at the given index
   const getNumZerosBeforeCharIndex = function _getNumZerosBeforeCharIndex(index) {
     let iter = 0;
-    while (zeroPositions[iter] < index) {
+    while (positionsOfZeros[iter] < index) {
       iter += 1;
     }
     return iter;
@@ -51,7 +49,7 @@ function Base64SuccinctTrie(someBase64String, someExpandedUnicodeArray, someZero
 
   // returns index of nth zero
   const select = function _select(n) {
-    const charIndex = zeroPositions[n];
+    const charIndex = positionsOfZeros[n];
     const char = base64String.charAt(charIndex);
     const charBitArray = Bytepack.getBitArray(char);
     const numZerosBeforeChar = getNumZerosBeforeCharIndex(charIndex);
@@ -67,10 +65,7 @@ function Base64SuccinctTrie(someBase64String, someExpandedUnicodeArray, someZero
 
   const nodeNumberToUnicodeSymbol = function _nodeNumberToUnicodeSymbol(nodeNumber) {
     if (nodeNumber === 0) { return ''; } // rootNode should return empty string ie no symbol
-    return Bytepack.expandedByteArrayToUnicodeSymbol(
-      expandedUnicodeArray.slice(
-        (nodeNumber * Bytepack.bytesPerSymbol),
-        (nodeNumber * Bytepack.bytesPerSymbol) + Bytepack.bytesPerSymbol));
+    return symbolString.charAt(nodeNumber);
   };
 
   const getNthChildOfNodeNumber = function _getNthChildOfNodeNumber(nodeNumber, childNumber) {
@@ -84,7 +79,7 @@ function Base64SuccinctTrie(someBase64String, someExpandedUnicodeArray, someZero
     The find() method returns the value of the first element in the array that
     satisfies the provided testing function. Otherwise undefined is returned.
     **/
-    const found = nodesThatDenoteWords.find(element => element === nodeNumber);
+    const found = nodeNumbersThatDenoteWords.find(element => element === nodeNumber);
     if (found === undefined) {
       return false;
     }
