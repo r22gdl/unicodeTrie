@@ -1,5 +1,5 @@
 {
-  "name": "nodetrie",
+  "name": "unicodeTrie",
   "version": "1.0.0",
   "description": "basic node trie for personal web index autosuggest feature",
   "main": "index.js",
