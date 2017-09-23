@@ -3,7 +3,7 @@
 const { Node } = require('./node.js');
 const Bytepack = require('./bytepack.js');
 
-/************************************ LIBRARY METHODS *****************************************/
+/************************************ GENERAL PUBLIC METHODS *****************************************/
 
 const walkThruPrefix = function _walkThruPrefix(startNode, prefix) {
   let remainingPrefix = prefix;
@@ -87,7 +87,7 @@ const insertNode = function _insertNode(nodeToInsert, prefix, someRoot) {
   if (subTrieRoot.child === null) {
     subTrieRoot.child = nodeToInsert;
   } else if (isPresent(subTrieRoot.child, charToInsert)) {
-    // do nothing
+    // do nothing, we should not insert a node that already exists at a given level in the trie
   } else {
     appendAtTail(subTrieRoot, subTrieRoot.child, nodeToInsert);
   }
@@ -317,7 +317,7 @@ const isStringInTrieHelper = function _isStringInTrieHelper(str, head) {
   return isStringInTrieHelper(remainingStr, subTrieRoot.child);
 };
 
-/************************************ CONSTRUCTOR *********************************************/
+/************************************ TRIE CONSTRUCTOR *********************************************/
 
 
 const Trie = function _Trie() {
