@@ -1,9 +1,8 @@
-/* eslint spaced-comment: 0, no-bitwise: 0, jsx-a11y/href-no-hash: 0, max-len: 0 */
+/* eslint spaced-comment: 0, no-bitwise: 0, jsx-a11y/href-no-hash: 0 */
 
 /************************************ CONSTANTS *************************************************/
 
 // INVARIANT: BYTES ARE LITTLE ENDIAN
-
 const byteWidth = 6;
 const BASE64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
 const BASE64_CACHE = (function setBase64Cache() { // EXPLAIN

@@ -1,9 +1,8 @@
 /* eslint spaced-comment: 0, jsx-a11y/href-no-hash: 0 */
-
-const { Node } = require('./node.js');
 const Bytepack = require('./bytepack.js');
+const { LinkedList } = require('./LinkedList.js');
 
-/************************************ LIBRARY METHODS *****************************************/
+/************************************ GENERAL TRIE METHODS *****************************************/
 
 const walkThruPrefix = function _walkThruPrefix(startNode, prefix) {
   let remainingPrefix = prefix;
@@ -22,62 +21,7 @@ const walkThruPrefix = function _walkThruPrefix(startNode, prefix) {
   return current;
 };
 
-const isPresent = function _isPresent(head, value) {
-  let valueIsPresent = false;
-  let current = head;
-  let next;
-
-  while (current !== null) {
-    if (current.value === value) {
-      valueIsPresent = true;
-    }
-    next = current.sibling;
-    current = next;
-  }
-
-  return valueIsPresent;
-};
-
-const getNode = function _getNode(head, value) {
-  if (isPresent(head, value) === false) {
-    throw 'getNode(head, value) called without first calling isPresent(head, value)';
-  }
-
-  let current = head;
-  let next;
-
-  while (current.value !== value) {
-    next = current.sibling;
-    current = next;
-  }
-
-  return current;
-};
-
-const getTail = function _getTail(someHead) {
-  let current = someHead;
-  let next = current.sibling;
-
-  while (next !== null) {
-    current = next;
-    next = next.sibling;
-  }
-
-  return current;
-};
-
-const appendAtTail = function _appendAtTail(thisRoot, head, nodeToInsert) {
-  const someRoot = thisRoot;
-
-  // empty linked list
-  if (head === null) {
-    someRoot.child = nodeToInsert;
-  } else {
-    getTail(head).sibling = nodeToInsert;
-  }
-};
-
-const insertNode = function _insertNode(nodeToInsert, prefix, someRoot) {
+const insertNodeIntoTrie = function _insertNodeIntoTrie(nodeToInsert, prefix, someRoot) {
   const charToInsert = nodeToInsert.value;
   const current = someRoot;
   const subTrieRoot = walkThruPrefix(current, prefix);
@@ -86,31 +30,20 @@ const insertNode = function _insertNode(nodeToInsert, prefix, someRoot) {
   // This linked list represents a single level in a subTrie
   if (subTrieRoot.child === null) {
     subTrieRoot.child = nodeToInsert;
-  } else if (isPresent(subTrieRoot.child, charToInsert)) {
-    // do nothing
+  } else if (LinkedList.nodeExistsInLinkedList(subTrieRoot.child, charToInsert)) {
+    // do nothing, we should not insert a node that already exists at a given level in the trie
   } else {
-    appendAtTail(subTrieRoot, subTrieRoot.child, nodeToInsert);
+    LinkedList.appendNodeToTailOfLinkedList(subTrieRoot, subTrieRoot.child, nodeToInsert);
   }
 };
 
-const makeNode = function _makeNode(char, bool) {
-  const nodeSpecs = {
-    value: char,
-    isWord: bool,
-    sibling: null,
-    child: null,
-  };
-
-  return Node(nodeSpecs);
-};
-
-const charToTrie = function _charToTrie(currentChar, index, array, someRoot) {
+const addSymbolToTrie = function _addSymbolToTrie(currentChar, index, array, someRoot) {
   // if last character, then character denotes word
   const denotesWord = (index === (array.length - 1));
-  const myNode = makeNode(currentChar, denotesWord);
+  const myNode = LinkedList.makeLinkedListNode(currentChar, denotesWord);
   const prefix = array.slice(0, index);
 
-  return insertNode(myNode, prefix, someRoot);
+  return insertNodeIntoTrie(myNode, prefix, someRoot);
 };
 
 const stringToSymbolArray = function _stringToSymbolArray(str) {
@@ -306,23 +239,30 @@ const isStringInTrieHelper = function _isStringInTrieHelper(str, head) {
     return true;
   }
   // if we recurse on empty subTrie or symbol is nowhere to be found at current level
-  if (head === null || (isPresent(head, arr[0]) === false)) {
+  if (head === null || (LinkedList.nodeExistsInLinkedList(head, arr[0]) === false)) {
     return false;
   }
   // every node is the root of a subTrie within larger Trie
-  const subTrieRoot = getNode(head, arr[0]);
+  const subTrieRoot = LinkedList.getNodeFromLinkedList(head, arr[0]);
   arr = arr.slice(1);
   const remainingStr = symbolArrayToString(arr);
 
   return isStringInTrieHelper(remainingStr, subTrieRoot.child);
 };
 
-/************************************ CONSTRUCTOR *********************************************/
+/************************************ TRIE CONSTRUCTOR *********************************************/
 
+/*
+
+We define a Trie as a doubly linked-list.
+
+**/
 
 const Trie = function _Trie() {
-  const superRootNode = Node(getSuperRootNodeSpecs());
-  const rootNode = Node(getRootNodeSpecs());
+  const superRootNodeSpecs = getSuperRootNodeSpecs();
+  const superRootNode = LinkedList.makeLinkedListNode(superRootNodeSpecs.value, superRootNodeSpecs.isWord);
+  const rootNodeSpecs = getRootNodeSpecs();
+  const rootNode = LinkedList.makeLinkedListNode(rootNodeSpecs.value, rootNodeSpecs.isWord);
   superRootNode.child = rootNode;
 
   const trieToBitArray = function _trieToBitArray() {
@@ -365,8 +305,8 @@ const Trie = function _Trie() {
 
   const addStringToTrie = function _addStringToTrie(str) {
     const strArr = stringToSymbolArray(str);
-    strArr.forEach((someChar, index, array) => {
-      charToTrie(someChar, index, array, rootNode);
+    strArr.forEach((someSymbol, index, array) => {
+      addSymbolToTrie(someSymbol, index, array, rootNode);
     });
   };
 
