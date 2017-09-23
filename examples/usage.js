@@ -9,28 +9,12 @@ myTrie.addStringToTrie('I');
 myTrie.addStringToTrie('<3');
 myTrie.addStringToTrie('⏣⅀ARNY⏣');
 
-console.log(myTrie.isStringInTrie('I')); // true
-console.log(myTrie.isStringInTrie('<3')); // true
-console.log(myTrie.isStringInTrie('⏣⅀ARNY⏣')); // true
-console.log(myTrie.isStringInTrie('⅀ARNY')); //false
-console.log('\n');
-
-const bitArray = myTrie.trieToBitArray();
-const base64String = Bytepack.bitArrayToBase64String(bitArray);
-const unicodeSymbolString = myTrie.trieToSymbolString();
-const expandedUnicodeSymbolArray = Bytepack.unicodeSymbolsToExpandedByteArray(unicodeSymbolString);
-const positionsOfZeros = myTrie.getPositionsOfZerosInTrie();
-const nodeNumbersThatDenoteWords = myTrie.getNodesThatDenoteWords();
-
-// Note: positionsOfZeros is a data structure that, together with the select() method mentioned
-// in Steve Havnov's post, helps implement the Base64SuccinctTrie.isStringInSuccinctTrie() method
-
-const mySuccintTrie = Base64SuccinctTrie(base64String, expandedUnicodeSymbolArray, positionsOfZeros, nodeNumbersThatDenoteWords);
+const mySuccintTrie = Base64SuccinctTrie(myTrie.getSuccinctTrieInformation());
 
 console.log(mySuccintTrie.isStringAWordInTrie('<')); // false
 console.log(mySuccintTrie.isStringAWordInTrie('')); // true
 console.log(mySuccintTrie.isStringAWordInTrie('⏣⅀ARNY⏣')); // true
-console.log(mySuccintTrie.isStringAWordInTrie('⏣⅀ARNY♛')); // false
+console.log(mySuccintTrie.isStringAWordInTrie('⏣⅀ARNY⏣♛♛♛♛♛')); // false
 console.log('\n');
 
 console.log(mySuccintTrie.getWordsThatStartWithPrefix('')); // ['', 'I', '<3', '⏣⅀ARNY⏣' ]

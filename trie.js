@@ -4,7 +4,7 @@ const { LinkedList } = require('./LinkedList.js');
 
 /************************************ GENERAL TRIE METHODS *****************************************/
 
-const walkThruPrefix = function _walkThruPrefix(startNode, prefix) {
+function walkThruPrefix(startNode, prefix) {
   let remainingPrefix = prefix;
   let current = startNode;
   let next = current.child;
@@ -21,7 +21,7 @@ const walkThruPrefix = function _walkThruPrefix(startNode, prefix) {
   return current;
 };
 
-const insertNodeIntoTrie = function _insertNodeIntoTrie(nodeToInsert, prefix, someRoot) {
+function insertNodeIntoTrie(nodeToInsert, prefix, someRoot) {
   const charToInsert = nodeToInsert.value;
   const current = someRoot;
   const subTrieRoot = walkThruPrefix(current, prefix);
@@ -37,7 +37,7 @@ const insertNodeIntoTrie = function _insertNodeIntoTrie(nodeToInsert, prefix, so
   }
 };
 
-const addSymbolToTrie = function _addSymbolToTrie(currentChar, index, array, someRoot) {
+function addSymbolToTrie(currentChar, index, array, someRoot) {
   // if last character, then character denotes word
   const denotesWord = (index === (array.length - 1));
   const myNode = LinkedList.makeLinkedListNode(currentChar, denotesWord);
@@ -46,11 +46,11 @@ const addSymbolToTrie = function _addSymbolToTrie(currentChar, index, array, som
   return insertNodeIntoTrie(myNode, prefix, someRoot);
 };
 
-const stringToSymbolArray = function _stringToSymbolArray(str) {
+function stringToSymbolArray(str) {
   return str.split('');
 };
 
-const symbolArrayToString = function _symbolArrayToString(arr) {
+function symbolArrayToString(arr) {
   let str = '';
   arr.forEach((symbol) => {
     str += symbol;
@@ -59,7 +59,7 @@ const symbolArrayToString = function _symbolArrayToString(arr) {
   return str;
 };
 
-const getSuperRootNodeSpecs = function _getSuperRootNodeSpecs() {
+function getSuperRootNodeSpecs() {
   const nodeSpecs = {
     value: 0xFF, // EXPLAIN
     isWord: false,
@@ -70,7 +70,7 @@ const getSuperRootNodeSpecs = function _getSuperRootNodeSpecs() {
   return nodeSpecs;
 };
 
-const getRootNodeSpecs = function _getRootNodeSpecs() {
+function getRootNodeSpecs() {
   const nodeSpecs = {
     value: 0xFF, // EXPLAIN
     isWord: true,
@@ -82,7 +82,7 @@ const getRootNodeSpecs = function _getRootNodeSpecs() {
 };
 
 // provide a closure with methods and an object
-const levelOrderMap = function _levelOrderMap(closure, thisRoot) {
+function levelOrderMap(closure, thisRoot) {
   let someRoot = thisRoot;
   const queue = [];
 
@@ -103,7 +103,7 @@ const levelOrderMap = function _levelOrderMap(closure, thisRoot) {
   return closure;
 };
 
-const trieToUnicodeSymbolArrayClosure = function _trieToUnicodeSymbolArrayClosure() {
+function trieToUnicodeSymbolArrayClosure() {
   let byteArray = [];
 
   function onChild(child) {
@@ -125,7 +125,7 @@ const trieToUnicodeSymbolArrayClosure = function _trieToUnicodeSymbolArrayClosur
   };
 };
 
-const trieToBitArrayClosure = function _trieToBitArrayClosure() {
+function trieToBitArrayClosure() {
   const bitArray = [];
 
   function onChild() {
@@ -147,7 +147,7 @@ const trieToBitArrayClosure = function _trieToBitArrayClosure() {
   };
 };
 
-const getPositionsOfZerosInTrieClosure = function _getPositionsOfZerosInTrieClosure() {
+function getPositionsOfZerosInTrieClosure() {
   let indexInBitArray = 0;
   const positionsOfZeros = [];
 
@@ -175,7 +175,7 @@ const getPositionsOfZerosInTrieClosure = function _getPositionsOfZerosInTrieClos
   };
 };
 
-const trieToSymbolStringClosure = function _trieToSymbolStringClosure() {
+function trieToSymbolStringClosure() {
   let str = '';
 
   function onChild() {
@@ -201,7 +201,7 @@ const trieToSymbolStringClosure = function _trieToSymbolStringClosure() {
   };
 };
 
-const getNodesThatDenoteWordsClosure = function _getNodesThatDenoteWordsClosure() {
+function getNodeNumbersThatDenoteWordsClosure() {
   let nodeNumber = 0;
   const nodesThatDenoteWords = [];
 
@@ -231,7 +231,7 @@ const getNodesThatDenoteWordsClosure = function _getNodesThatDenoteWordsClosure(
   };
 };
 
-const isStringInTrieHelper = function _isStringInTrieHelper(str, head) {
+function isStringInTrieHelper(str, head) {
   let arr = stringToSymbolArray(str);
 
   // if symbol array is empty, we've recursed thru entire string
@@ -258,32 +258,32 @@ We define a Trie as a doubly linked-list.
 
 **/
 
-const Trie = function _Trie() {
+function Trie() {
   const superRootNodeSpecs = getSuperRootNodeSpecs();
   const superRootNode = LinkedList.makeLinkedListNode(superRootNodeSpecs.value, superRootNodeSpecs.isWord);
   const rootNodeSpecs = getRootNodeSpecs();
   const rootNode = LinkedList.makeLinkedListNode(rootNodeSpecs.value, rootNodeSpecs.isWord);
   superRootNode.child = rootNode;
 
-  const trieToBitArray = function _trieToBitArray() {
+  function trieToBitArray() {
     const myClosure = trieToBitArrayClosure();
     levelOrderMap(myClosure, superRootNode);
     return myClosure.getReturnValue();
   };
 
-  const trieToUnicodeSymbolArray = function _trieToUnicodeSymbolArray() {
+  function trieToUnicodeSymbolArray() {
     const myClosure = trieToUnicodeSymbolArrayClosure();
     levelOrderMap(myClosure, superRootNode);
     return myClosure.getReturnValue();
   };
 
-  const trieToSymbolString = function _trieToSymbolString() {
+  function trieToSymbolString() {
     const myClosure = trieToSymbolStringClosure();
     levelOrderMap(myClosure, rootNode);
     return myClosure.getReturnValue();
   };
 
-  const getPositionsOfZerosInTrie = function _getPositionsOfZerosInTrie() {
+  function getPositionsOfZerosInTrie() {
     const myClosure = getPositionsOfZerosInTrieClosure();
     levelOrderMap(myClosure, superRootNode);
     return myClosure.getReturnValue();
@@ -293,30 +293,39 @@ const Trie = function _Trie() {
   returns an array of node numbers (the number representing the order of the node in level order
   traversal) for nodes that denote the end of a complete word in trie
   **/
-  const getNodesThatDenoteWords = function _getNodesThatDenoteWords() {
-    const myClosure = getNodesThatDenoteWordsClosure();
+  function getNodeNumbersThatDenoteWords() {
+    const myClosure = getNodeNumbersThatDenoteWordsClosure();
     levelOrderMap(myClosure, rootNode);
     return myClosure.getReturnValue();
   };
 
-  const isStringInTrie = function _isStringInTrie(str) {
+  function isStringInTrie(str) {
     return isStringInTrieHelper(str, rootNode.child);
   };
 
-  const addStringToTrie = function _addStringToTrie(str) {
+  function addStringToTrie(str) {
     const strArr = stringToSymbolArray(str);
     strArr.forEach((someSymbol, index, array) => {
       addSymbolToTrie(someSymbol, index, array, rootNode);
     });
   };
 
+  function getSuccinctTrieInformation() {
+    const base64String = Bytepack.bitArrayToBase64String(trieToBitArray());
+    const symbolString = trieToSymbolString();
+    const positionsOfZeros = getPositionsOfZerosInTrie();
+    const nodeNumbersThatDenoteWords = getNodeNumbersThatDenoteWords();
+
+    return {
+      base64String,
+      symbolString,
+      positionsOfZeros,
+      nodeNumbersThatDenoteWords,
+    };
+  };
 
   return {
-    trieToBitArray,
-    trieToUnicodeSymbolArray,
-    trieToSymbolString,
-    getPositionsOfZerosInTrie,
-    getNodesThatDenoteWords,
+    getSuccinctTrieInformation,
     isStringInTrie,
     addStringToTrie,
   };

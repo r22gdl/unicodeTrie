@@ -1,8 +1,6 @@
-/* eslint spaced-comment: 0, jsx-a11y/href-no-hash: 0 */
+/* eslint spaced-comment: 0, jsx-a11y/href-no-hash: 0, max-len: 0 */
 
-
-
-/************************************ NODE CONSTRUCTOR *********************************************/
+/************************************ NODE CONSTRUCTOR ***************************************/
 /*
 
 The "Node" is the basic unit of our linked list class
@@ -22,7 +20,7 @@ function Node(spec) {
   };
 }
 
-/************************************ GENERAL LINKED LIST METHODS *********************************************/
+/************************************ GENERAL LINKED LIST METHODS ******************************/
 function nodeExistsInLinkedList(head, value) {
   let valueIsPresent = false;
   let current = head;
@@ -80,7 +78,7 @@ function makeLinkedListNode(char, bool) {
   return Node(nodeSpecs);
 }
 
-/************************************ LINKED LIST METHODS TO BE EXPORTED *********************************************/
+/************************** LINKED LIST METHODS TO BE EXPORTED *****************************/
 const LinkedList = {
   nodeExistsInLinkedList,
   getNodeFromLinkedList,
