@@ -1,2 +1,5 @@
-// [Step 1] Update index.js as you wish
-// [Step 2] From your terminal, enter: npm start
+const { Trie } = require('./trie.js');
+const { Base64SuccinctTrie } = require('./succinctTrie.js');
+
+exports.Trie = Trie;
+exports.SuccinctTrie = Base64SuccinctTrie;
