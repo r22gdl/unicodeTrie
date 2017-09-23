@@ -24,6 +24,8 @@ const removeLastSymbol = function _removeLastSymbol(someString) {
 
 function Base64SuccinctTrie(succinctTrieInformation) {
 
+  const succintTrieDetails = succinctTrieInformation;
+
   const {base64String, symbolString, positionsOfZeros, nodeNumbersThatDenoteWords} = succinctTrieInformation;
 
   // returns the number of zeros present in base64String before the char at the given index
@@ -257,9 +259,14 @@ function Base64SuccinctTrie(succinctTrieInformation) {
     return formWords(prefixString, wordEndings, prefixIsWord);
   };
 
+  function getSuccinctTrieDetails() {
+    return succintTrieDetails;
+  }
+
   return {
     isStringAWordInTrie,
     getWordsThatStartWithPrefix,
+    getSuccinctTrieDetails,
   };
 }
 
