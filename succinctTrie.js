@@ -24,7 +24,7 @@ const removeLastSymbol = function _removeLastSymbol(someString) {
 
 function Base64SuccinctTrie(succinctTrieInformation) {
 
-  const succintTrieDetails = succinctTrieInformation;
+  const succinctTrieDetails = succinctTrieInformation;
 
   const {base64String, symbolString, positionsOfZeros, nodeNumbersThatDenoteWords} = succinctTrieInformation;
 
@@ -51,7 +51,7 @@ function Base64SuccinctTrie(succinctTrieInformation) {
 
   // returns index of nth zero
   const select = function _select(n) {
-    const charIndex = positionsOfZeros[n];
+    const charIndex = positionsOfZeros[n - 1];
     const char = base64String.charAt(charIndex);
     const charBitArray = Bytepack.getBitArray(char);
     const numZerosBeforeChar = getNumZerosBeforeCharIndex(charIndex);
@@ -234,6 +234,7 @@ function Base64SuccinctTrie(succinctTrieInformation) {
     if (someNode === null) { // prefixString not stored in trie
       return [];
     }
+
     // start walking
     counterStack.push(1);
     nodeStack.push(someNode);
@@ -260,7 +261,7 @@ function Base64SuccinctTrie(succinctTrieInformation) {
   };
 
   function getSuccinctTrieDetails() {
-    return succintTrieDetails;
+    return succinctTrieDetails;
   }
 
   return {
